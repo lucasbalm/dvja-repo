@@ -55,6 +55,7 @@ fortify-sast-scancentral:
 
   # Run Fortify ScanCentral Client. SSC_URL and SSC_TOKEN are expected as GitLab CICD Variables in the template (masking recommended).
   script:
+    - 'echo client_auth_token=CHANGEME321! > /opt/Fortify/ScanCentral/Core/config/client.properties'
     - 'scancentral -sscurl $SSC_URL -ssctoken $SSC_TOKEN start $SCANCENTRAL_BUILD_OPTS -upload -application $SSC_APP -version 1 -uptoken $SSC_TOKEN'
   
   allow_failure: true
