@@ -28,3 +28,10 @@ nexus-iq-dependency-check:
     name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
       - dvja-policy-eval-report.html
+
+build:
+  stage: build
+  image: maven:3.8.4-openjdk-17
+  script:
+    - "mvn install -B"
+
