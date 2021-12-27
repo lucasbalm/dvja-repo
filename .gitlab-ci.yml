@@ -56,3 +56,9 @@ nexus-iq-policy-eval:
     name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
       - dvja-policy-eval-report.html
+
+fortify-sast:
+  stage: test
+  image: fortifydocker/fortify-ci-tools:latest
+  script:
+    - "scancentral -sscurl 'http://192.168.0.200:8080/' -ssctoken '63d6e452-d1cb-4faf-9084-3802231e2eec' start -bt mvn -t -upload -uptoken '63d6e452-d1cb-4faf-9084-3802231e2eec' -pool '00000000-0000-0000-0000-000000000002' -application 'DVJA' -version '1'"
