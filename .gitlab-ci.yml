@@ -14,6 +14,9 @@
 # For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
 
 image: maven:3.8.4-jdk-11
+cache:
+  paths:
+    - .m2/repository
 
 stages:          # List of stages for jobs, and their order of execution
   - pre-build
@@ -34,15 +37,14 @@ nexus-iq-dependency-check:
 build:
   stage: build
   image: maven:3.8.4-jdk-11
-  cache:
-    paths:
-      - .m2/repository
   script:
     - "mvn clean package"
 
 nexus-iq-policy-eval:
   stage: test
   image: sonatype/gitlab-nexus-iq-pipeline:latest
+  dependencies:
+    - build
   script:
     - /sonatype/evaluate -i dvja /target/*.war
   artifacts:
