@@ -31,7 +31,7 @@ stages:          # List of stages for jobs, and their order of execution
 
 build:
   stage: build
-  image: maven:latest
+  image: maven:3.8.4-jdk-11
   script:
     - "mvn clean package"
 
