@@ -40,8 +40,7 @@ build:
 
 docker build:
   stage: deploy
-  image:
-    name: docker/compose:latest
+  image: docker/compose:latest
   before_script:
     - docker version
     - docker-compose version
@@ -51,9 +50,10 @@ docker build:
     - docker-compose up -d
 
 fortify-dast-scancentral:
+  variables:
+    URL_SCDAST_API: "http://192.168.0.200:8095"
+    CICD_TOKEN: "ddca4e67-dfed-4b83-a6d3-a1112188c588"
   stage: deploy
+  image: mcr.microsoft.com/powershell:latest
   script:
-    - "curl --location --request POST 'http://192.168.0.200:8095/api/scans/start-scan-cicd' \
-      --header 'Authorization: FORTIFYTOKEN MzgyZTg1ZTUtOTI5ZC00MjQ5LWI3YzEtOTBmM2M5NDQ3YTU3' \
-      --header 'Content-Type: application/json' \
-      --data-raw '{cicdToken: ddca4e67-dfed-4b83-a6d3-a1112188c588}'"
+    - pwsh ./fortify-dast.ps1 $URL_SCDAST_API $CICD_TOKEN
