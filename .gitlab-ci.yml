@@ -35,9 +35,11 @@ build:
     paths:
       - ./target
 
-jetty run:
-  stage: test
-  image: maven:3.8.4-jdk-11
+docker build:
+  stage: deploy
+  image: docker/compose:latest
+  before_script:
+  - docker version
+  - docker-compose version
   script:
-    - "mvn -Djetty.port=80 jetty:run"
-
+    - docker-compose build
