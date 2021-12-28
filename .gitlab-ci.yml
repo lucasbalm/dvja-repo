@@ -48,4 +48,12 @@ docker build:
   script:
     - docker-compose down
     - docker-compose build
-    - docker-compose up
+    - docker-compose up -d
+
+fortify-dast-scancentral:
+  stage: deploy
+  script:
+    - "curl --location --request POST 'http://192.168.0.200:8095/api/scans/start-scan-cicd' \
+      --header 'Authorization: FORTIFYTOKEN MzgyZTg1ZTUtOTI5ZC00MjQ5LWI3YzEtOTBmM2M5NDQ3YTU3' \
+      --header 'Content-Type: application/json' \
+      --data-raw '{cicdToken: ddca4e67-dfed-4b83-a6d3-a1112188c588}'"
