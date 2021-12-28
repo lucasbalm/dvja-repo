@@ -47,9 +47,7 @@ docker build:
   before_script:
     - docker version
     - docker-compose version
-  build:
-    stage: deploy
-    script:
-      - docker-compose down
-      - docker-compose build
-      - docker-compose up tester-image
+  script:
+    - docker-compose down
+    - docker-compose build
+    - docker-compose up tester-image
