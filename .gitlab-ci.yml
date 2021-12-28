@@ -67,7 +67,7 @@ fortify-sast-scancentral:
   #   For other build tools (-bt none), add your build commands to download necessary dependencies.
   #   ScanCentral documentation is located at https://www.microfocus.com/documentation/fortify-software-security-center/ 
   variables:
-    SCANCENTRAL_BUILD_OPTS: "-bt mvn"
+    SCANCENTRAL_BUILD_OPTS: "-p ./target/*.war"
     SSC_APP: $CI_PROJECT_NAME
     SSC_PV: $CI_COMMIT_REF_NAME
 
