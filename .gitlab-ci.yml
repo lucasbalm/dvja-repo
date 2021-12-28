@@ -67,7 +67,7 @@ fortify-sast-scancentral:
   #   For other build tools (-bt none), add your build commands to download necessary dependencies.
   #   ScanCentral documentation is located at https://www.microfocus.com/documentation/fortify-software-security-center/ 
   variables:
-    SCANCENTRAL_BUILD_OPTS: "-p ./target/*.war"
+    SCANCENTRAL_BUILD_OPTS: "-bt mvn"
     SSC_APP: $CI_PROJECT_NAME
     SSC_PV: $CI_COMMIT_REF_NAME
 
@@ -77,3 +77,13 @@ fortify-sast-scancentral:
     - 'scancentral -sscurl $SSC_URL -ssctoken $SSC_TOKEN start $SCANCENTRAL_BUILD_OPTS -upload -application $SSC_APP -version 1 -uptoken $SSC_TOKEN -block -f worker.fpr -log worker.log'
   
   allow_failure: true
+
+fortify-dast-scancentral:
+  stage: test
+  image: maven:3.8.4-jdk-11
+  script:
+    - "mvn -Djetty.port=8888 jetty:run"
+    - "curl --location --request POST 'http://192.168.0.200:8095/api/scans/start-scan-cicd' \
+      --header 'Content-Type: application/json' \
+      --header 'Authorization: USER-SID 38fFwAivnQjyZjZsDfoAvpf82PAdN3QwQiVu7h4USfQ' \
+      --data-raw '{cicdToken: cd8d9a87-ab94-4e43-8411-fd7467effb12}'"
