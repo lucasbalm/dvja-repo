@@ -1,12 +1,13 @@
 $url_scdast_api = $args[0]
-$cicdToken = $args[1]
+$login_token = $args[1]
+$cicdToken = $args[2]
 $ErrorActionPreference = "Stop"
 
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch
 $StopWatch.Start()
 
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-$headers.Add("Authorization", "FORTIFYTOKEN MzgyZTg1ZTUtOTI5ZC00MjQ5LWI3YzEtOTBmM2M5NDQ3YTU3")
+$headers.Add("Authorization", "$login_token")
 $headers.Add("Content-Type", "application/json")
 
 $body = "{
