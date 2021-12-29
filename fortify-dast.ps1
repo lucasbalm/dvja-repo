@@ -1,10 +1,21 @@
 $url_scdast_api = $args[0]
-$login_token = $args[1]
-$cicdToken = $args[2]
+$cicdToken = $args[1]
 $ErrorActionPreference = "Stop"
 
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch
 $StopWatch.Start()
+
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("accept", "text/plain")
+$headers.Add("Content-Type", "application/json-patch+json")
+
+$body = "{`"username`":`"ci_user`",`"password`":`"Admin01--123`"}"
+
+$tokenurl = 'http://' + $url_scdast_api + '/api/v2/auth'
+
+$responsetoken = Invoke-RestMethod $tokenurl -Method 'POST' -Headers $headers -Body $body
+
+$login_token = $responsetoken.token
 
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $headers.Add("Authorization", "$login_token")
