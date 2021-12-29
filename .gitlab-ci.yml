@@ -94,9 +94,8 @@ docker build:
 fortify-dast-scancentral:
   variables:
     URL_SCDAST_API: "192.168.0.200:8095"
-    LOGIN_TOKEN: "FORTIFYTOKEN MzgyZTg1ZTUtOTI5ZC00MjQ5LWI3YzEtOTBmM2M5NDQ3YTU3"
     CICD_TOKEN: "ddca4e67-dfed-4b83-a6d3-a1112188c588"
   stage: deploy
   image: mcr.microsoft.com/powershell:latest
   script:
-    - pwsh ./fortify-dast.ps1 $URL_SCDAST_API $LOGIN_TOKEN $CICD_TOKEN
+    - pwsh ./fortify-dast.ps1 $URL_SCDAST_API $CICD_TOKEN
