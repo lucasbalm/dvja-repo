@@ -43,6 +43,9 @@ build:
   image: maven:3.8.4-jdk-11
   script:
     - "mvn clean package"
+  cache:
+    paths:
+    - ./target
   artifacts:
     paths:
       - ./target
