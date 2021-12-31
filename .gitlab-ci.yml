@@ -104,7 +104,7 @@ sonatype-container-sca:
   dependencies:
     - docker build
   script:
-    - /sonatype/evaluate -t stage -i dvja ./dvja_app.tar
+    - /sonatype/evaluate -t stage release -i dvja ./dvja_app.tar
   artifacts:
     name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
