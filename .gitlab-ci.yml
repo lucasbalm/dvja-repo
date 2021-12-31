@@ -70,7 +70,7 @@ fortify-sast-scancentral:
   #   ScanCentral documentation is located at https://www.microfocus.com/documentation/fortify-software-security-center/ 
   variables:
     SCANCENTRAL_BUILD_OPTS: "-bt mvn"
-    SSC_APP: $CI_PROJECT_NAME
+    SSC_APP: "DVJA"
     SSC_PV: $CI_COMMIT_REF_NAME
 
   # Run Fortify ScanCentral Client. SSC_URL and SSC_TOKEN are expected as GitLab CICD Variables in the template (masking recommended).
