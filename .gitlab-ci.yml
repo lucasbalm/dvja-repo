@@ -34,9 +34,9 @@ sonatype-dependency-sca:
   script:
     - /sonatype/evaluate -t source -w -i dvja *.xml
   artifacts:
-    name: "dependency-sca-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
-      - dvja-dependency-sca-eval-report.html
+      - dvja-policy-eval-report.html
 
 build:
   stage: build
@@ -55,9 +55,9 @@ sonatype-binary-sca:
   script:
     - /sonatype/evaluate -t build -i dvja ./target/*.war
   artifacts:
-    name: "binary-sca-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
-      - dvja-binary-sca-eval-report.html
+      - dvja-policy-eval-report.html
 
 fortify-sast-scancentral:
   image: fortifydocker/fortify-ci-tools:latest
@@ -109,9 +109,9 @@ sonatype-container-sca:
   script:
     - /sonatype/evaluate -t stage -i dvja ./target/*.tar
   artifacts:
-    name: "container-sca-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
-      - dvja-container-sca-eval-report.html
+      - dvja-policy-eval-report.html
 
 release:
   stage: release
