@@ -94,6 +94,21 @@ docker build:
     - docker-compose build
     - docker-compose up -d
     - docker save -o dvja_app.tar dvja_app
+  cache:
+    paths:
+    - ./dvja_app.tar
+
+sonatype-container-sca:
+  stage: test
+  image: sonatype/gitlab-nexus-iq-pipeline:latest
+  dependencies:
+    - docker build
+  script:
+    - /sonatype/evaluate -t stage -i dvja ./dvja_app.tar
+  artifacts:
+    name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - dvja-policy-eval-report.html
 
 fortify-dast-scancentral:
   variables:
@@ -103,18 +118,6 @@ fortify-dast-scancentral:
   image: mcr.microsoft.com/powershell:latest
   script:
     - pwsh ./fortify-dast.ps1 $URL_SCDAST_API $CICD_TOKEN
-
-sonatype-container-sca:
-  stage: test
-  image: sonatype/gitlab-nexus-iq-pipeline:latest
-  dependencies:
-    - docker build
-  script:
-    - /sonatype/evaluate -t stage -i dvja ./target/*.tar
-  artifacts:
-    name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    paths:
-      - dvja-policy-eval-report.html
 
 release:
   stage: release
