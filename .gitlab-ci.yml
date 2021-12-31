@@ -79,8 +79,12 @@ fortify-sast-scancentral:
   # Run Fortify ScanCentral Client. SSC_URL and SSC_TOKEN are expected as GitLab CICD Variables in the template (masking recommended).
   script:
     - 'echo client_auth_token=CHANGEME321! > /opt/Fortify/ScanCentral/Core/config/client.properties'
-    - 'scancentral -sscurl $SSC_URL -ssctoken $SSC_TOKEN start $SCANCENTRAL_BUILD_OPTS -upload -application $SSC_APP -version 1 -uptoken $SSC_TOKEN -block -f worker.fpr -log worker.log'
-  
+    - 'scancentral -sscurl $SSC_URL -ssctoken $SSC_TOKEN start $SCANCENTRAL_BUILD_OPTS -upload -application $SSC_APP -version 1 -uptoken $SSC_TOKEN -block -f dvja-sast-eval.fpr -log worker.log'
+  artifacts:
+    name: "sast-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - dvja-sast-eval.fpr
+      - worker.log
   allow_failure: true
 
 docker build:
@@ -106,9 +110,9 @@ sonatype-container-sca:
   script:
     - /sonatype/evaluate -t stage-release -i dvja ./dvja_app.tar
   artifacts:
-    name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    name: "dast-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
-      - dvja-policy-eval-report.html
+      - ./*.fpr
 
 fortify-dast-scancentral:
   variables:
@@ -118,6 +122,10 @@ fortify-dast-scancentral:
   image: mcr.microsoft.com/powershell:latest
   script:
     - pwsh ./fortify-dast.ps1 $URL_SCDAST_API $CICD_TOKEN
+  artifacts:
+    name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - dvja-policy-eval-report.html
 
 release:
   stage: release
