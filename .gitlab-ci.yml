@@ -23,20 +23,20 @@ cache:
     - .m2/repository
 
 stages:          # List of stages for jobs, and their order of execution
-  - pre-build
+  - commit
   - build
   - test
-  - deploy
+  - release
 
-nexus-iq-dependency-check:
-  stage: pre-build
+sonatype-dependency-sca:
+  stage: commit
   image: sonatype/gitlab-nexus-iq-pipeline:latest
   script:
     - /sonatype/evaluate -t source -w -i dvja *.xml
   artifacts:
-    name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    name: "dependency-sca-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
-      - dvja-policy-eval-report.html
+      - dvja-dependency-sca-eval-report.html
 
 build:
   stage: build
@@ -47,21 +47,21 @@ build:
     paths:
       - ./target
 
-nexus-iq-policy-eval:
-  stage: test
+sonatype-binary-sca:
+  stage: build
   image: sonatype/gitlab-nexus-iq-pipeline:latest
   dependencies:
     - build
   script:
     - /sonatype/evaluate -t build -i dvja ./target/*.war
   artifacts:
-    name: "policy-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    name: "binary-sca-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
     paths:
-      - dvja-policy-eval-report.html
+      - dvja-binary-sca-eval-report.html
 
 fortify-sast-scancentral:
   image: fortifydocker/fortify-ci-tools:latest
-
+  stage: build
   # Update/override variables based on the ScanCentral Client documentation for your project's included tech stack(s). Helpful hints:
   #   ScanCentral Client will download dependencies for maven (-bt mvn) and gradle (-bt gradle).
   #   The current fortify-ci-tools image is Linux only at this time. Msbuild integration is not currently supported.
@@ -81,7 +81,7 @@ fortify-sast-scancentral:
   allow_failure: true
 
 docker build:
-  stage: deploy
+  stage: test
   image: docker/compose:latest
   before_script:
     - docker version
@@ -90,12 +90,36 @@ docker build:
     - docker-compose down
     - docker-compose build
     - docker-compose up -d
+    - docker save -o dvja_app.tar dvja_app
 
 fortify-dast-scancentral:
   variables:
     URL_SCDAST_API: "192.168.0.200:8095"
     CICD_TOKEN: "ddca4e67-dfed-4b83-a6d3-a1112188c588"
-  stage: deploy
+  stage: test
   image: mcr.microsoft.com/powershell:latest
   script:
     - pwsh ./fortify-dast.ps1 $URL_SCDAST_API $CICD_TOKEN
+
+sonatype-container-sca:
+  stage: test
+  image: sonatype/gitlab-nexus-iq-pipeline:latest
+  dependencies:
+    - docker build
+  script:
+    - /sonatype/evaluate -t stage -i dvja ./target/*.tar
+  artifacts:
+    name: "container-sca-eval-$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - dvja-container-sca-eval-report.html
+
+release:
+  stage: release
+  image: docker/compose:latest
+  before_script:
+    - docker version
+    - docker-compose version
+  script:
+    - docker tag dvja_app dvja_app:1
+    - echo "docker push dvja_app:1"
+
