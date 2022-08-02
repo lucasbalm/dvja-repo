@@ -30,3 +30,15 @@ jobs:
       run: sourceanalyzer -b dvja -scan -f MyResults.fpr
     - name: Upload FPR to Fortify SSC
       run: fortifyclient uploadFPR -url http://fortify-linux:8080/ -authtoken 3c7444a3-8b14-460c-8a1a-0254c1a6dee0 -application DVJA  -applicationVersion 1.0 -file MyResults.fpr
+    - name: Export Results
+      uses: fortify/gha-export-vulnerabilities@v1
+      with:
+        ssc_base_url: "http://fortify-linux:8080/"
+        ssc_auth_token: "3c7444a3-8b14-460c-8a1a-0254c1a6dee0"
+        ssc_version_id: 6
+
+    # Import Fortify SAST results to GitHub Security Code Scanning
+    - name: Import Results
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: ./gh-fortify-sast.sarif
