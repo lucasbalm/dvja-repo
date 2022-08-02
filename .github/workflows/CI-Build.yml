@@ -25,6 +25,6 @@ jobs:
 #    - name: Build with Maven
 #      run: mvn -B package --file pom.xml
     - name: Fortify SAST Translate (Sourcecodeanalyzer)
-      run: sourceanalyzer -b dvja mvn package
+      run: sourceanalyzer -b dvja
     - name: Fortify SAST Scan (Sourcecodeanalyzer)
       run: sourceanalyzer -b dvja -scan -f MyResults.fpr
