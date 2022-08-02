@@ -28,3 +28,5 @@ jobs:
       run: sourceanalyzer -b dvja .
     - name: Fortify SAST Scan (Sourcecodeanalyzer)
       run: sourceanalyzer -b dvja -scan -f MyResults.fpr
+    - name: Upload FPR to Fortify SSC
+      run: fortifyclient uploadFPR -url http://fortify-linux:8080/ -authtoken 3c7444a3-8b14-460c-8a1a-0254c1a6dee0 -application DVJA  -applicationVersion 1.0 -file MyResults.fpr
