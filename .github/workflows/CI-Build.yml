@@ -33,8 +33,8 @@ jobs:
     - name: Export Results
       uses: fortify/gha-export-vulnerabilities@v1
       with:
-        ssc_base_url: "http://fortify-linux:8080/"
-        ssc_auth_token: "3c7444a3-8b14-460c-8a1a-0254c1a6dee0"
+        ssc_base_url: "http://fortify-linux:8080"
+        ssc_auth_token: "ZjFkMTQzMGYtMjRkYS00MTExLTg2OTMtM2Y3ZTUzYzI3YTc2"
         ssc_version_id: 6
 
     # Import Fortify SAST results to GitHub Security Code Scanning
