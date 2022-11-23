@@ -115,8 +115,8 @@ jobs:
           # Response code to wait for
           responseCode: 200
           # Timeout before giving up in ms
-          timeout: 30000
+          timeout: 60000
           # Interval between polling in ms
-          interval: 200
+          interval: 1000
       - name: Run Stop Container
         run: docker compose down
