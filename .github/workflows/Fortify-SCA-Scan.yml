@@ -12,7 +12,7 @@ jobs:
   sca-source:
     runs-on: self-hosted
     steps:
-    - name: Nexus IQ SCA for GitHub Actions (Source File Scan)
+    - name: Nexus IQ SCA (Source File Scan)
       uses: sonatype-nexus-community/iq-github-action@1.1.0
       with:
         # Nexus IQ Server URL
@@ -38,7 +38,7 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
-    - name: Nexus IQ SCA for GitHub Actions (Binary File Scan)
+    - name: Nexus IQ SCA (Binary File Scan)
       uses: sonatype-nexus-community/iq-github-action@1.1.0
       with:
         # Nexus IQ Server URL
@@ -84,7 +84,7 @@ jobs:
     runs-on: self-hosted
     needs: docker-build
     steps:
-    - name: Nexus IQ SCA for GitHub Actions (Docker image file Scan)
+    - name: Nexus IQ SCA (Docker image file Scan)
       uses: sonatype-nexus-community/iq-github-action@1.1.0
       with:
         # Nexus IQ Server URL
@@ -105,5 +105,10 @@ jobs:
       steps:
       - name: Run Docker Image
         run: docker compose up -d
-      - name: Test Enviroment
-        run: curl http://localhost:8088
+      - name: HTTP Status Check 
+        uses: lakuapik/gh-actions-http-status@v1
+        with:
+          sites: '["http://localhost:8088"]'
+          expected: '[301, 200]'
+  #    - name: Stop Docker Container
+  #      run: docker compose down
