@@ -105,8 +105,18 @@ jobs:
       steps:
       - name: Run Docker Image
         run: docker compose up -d
-      - name: Http Polling
-        uses: cheerz/poll_status@v0.0.1
+      - name: Wait For HTTP Responses
+        # You may pin to the exact commit or the version.
+        # uses: cygnetdigital/wait_for_response@510ed9823ee9c5f876e57d25bd87c575032d8156
+        uses: cygnetdigital/wait_for_response@v2.0.0
         with:
-          url: http://fortify-linux:8088
+          # URL to poll
+          url: http://fortify-linux:8088/
+          # Response code to wait for
           responseCode: 200
+          # Timeout before giving up in ms
+          timeout: 30000
+          # Interval between polling in ms
+          interval: 200
+      - name: Run Stop Container
+        run: docker compose down
