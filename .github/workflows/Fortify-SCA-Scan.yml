@@ -108,7 +108,7 @@ jobs:
       - name: HTTP Status Check 
         uses: lakuapik/gh-actions-http-status@v1
         with:
-          sites: '["http://localhost:8088"]'
+          sites: '["http://fortify-linux:8088"]'
           expected: '[301, 200]'
   #    - name: Stop Docker Container
   #      run: docker compose down
