@@ -10,10 +10,8 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-
+  BUILD:
     runs-on: self-hosted
-
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 11
@@ -24,19 +22,39 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+  SCA:
+    runs-on: self-hosted
+    steps:
+    - name: Nexus IQ for GitHub Actions
+      uses: sonatype-nexus-community/iq-github-action@1.1.0
+      with:
+        # Nexus IQ Server URL
+        serverUrl: http://fortify-linux:8070/
+        # Username to connect to IQ Server for policy evaluation
+        username: admin
+        # Password to connect to IQ Server for policy evaluation
+        password: admin123
+        # Determines the policy elements (policies, labels, and license threat groups) to associate with this build, and is managed via the Nexus IQ Server.
+        applicationId: dvja
+        # Controls the stage the policy evaluation will be run against on the Nexus IQ Server.
+        stage: build
+        # This is the path to a specific application archive file, a directory containing such archives or the ID of a Docker image. For archives, a number of formats are supported, including jar, war, ear, tar, tar.gz, zip and many others.
+        target: ./target/
+  SAST:
+    runs-on: self-hosted
+    steps:
     - name: Fortify SAST Translate (Sourcecodeanalyzer)
       run: sourceanalyzer -b dvja mvn package
     - name: Fortify SAST Scan (Sourcecodeanalyzer)
-      run: sourceanalyzer -b dvja -scan -f MyResults.fpr
+      run: sourceanalyzer -b dvja -scan -f results.fpr
     - name: Upload FPR to Fortify SSC
-      run: fortifyclient uploadFPR -url http://fortify-linux:8080/ -authtoken 3c7444a3-8b14-460c-8a1a-0254c1a6dee0 -application DVJA  -applicationVersion 1.0 -file MyResults.fpr
+      run: fortifyclient uploadFPR -url http://fortify-linux:8080/ -authtoken 1f1062f9-ca0c-4ad4-8433-94909beea954 -application DVJA  -applicationVersion 1.0 -file results.fpr
     - name: Export Results
       uses: fortify/gha-export-vulnerabilities@v1
       with:
         ssc_base_url: "http://fortify-linux:8080"
-        ssc_auth_token: "f1d1430f-24da-4111-8693-3f7e53c27a76"
+        ssc_auth_token: "1f1062f9-ca0c-4ad4-8433-94909beea954"
         ssc_version_id: 6
-
     # Import Fortify SAST results to GitHub Security Code Scanning
     - name: Import Results
       uses: github/codeql-action/upload-sarif@v1
