@@ -52,7 +52,7 @@ jobs:
       run: fortifyclient uploadFPR -url ${{secrets.SSC_URL}} -authtoken ${{secrets.SSC_UPLOAD_TOKEN}} -application DVJA  -applicationVersion 1.0 -file results.fpr
   export-results:
     runs-on: self-hosted
-    needs: sast
+    needs: [sast,sca]
     steps:
     - name: Export Results
       uses: fortify/gha-export-vulnerabilities@v1
