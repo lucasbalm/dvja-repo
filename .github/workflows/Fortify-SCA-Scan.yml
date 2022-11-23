@@ -90,5 +90,32 @@ jobs:
     steps:
     - name: Build Docker Image
       run: docker compose build
-    - name: Run Docker Image
-      run: docker compose up
+    - name: Export docker image
+      run: docker save dvja-app -o dvja.tar
+  sca-container:
+    runs-on: self-hosted
+    needs: docker-build
+    steps:
+    - name: Nexus IQ SCA for GitHub Actions (Docker image file Scan)
+      uses: sonatype-nexus-community/iq-github-action@1.1.0
+      with:
+        # Nexus IQ Server URL
+        serverUrl: ${{secrets.NEXUS_IQ_SERVER_URL}}
+        # Username to connect to IQ Server for policy evaluation
+        username: ${{secrets.NEXUS_IQ_SERVER_USER}}
+        # Password to connect to IQ Server for policy evaluation
+        password: ${{secrets.NEXUS_IQ_SERVER_PASSWORD}}
+        # Determines the policy elements (policies, labels, and license threat groups) to associate with this build, and is managed via the Nexus IQ Server.
+        applicationId: dvja
+        # Controls the stage the policy evaluation will be run against on the Nexus IQ Server.
+        stage: stage
+        # This is the path to a specific application archive file, a directory containing such archives or the ID of a Docker image. For archives, a number of formats are supported, including jar, war, ear, tar, tar.gz, zip and many others.
+        target: dvja.tar
+  docker-run:
+      runs-on: self-hosted
+      needs: sca-container
+      steps:
+      - name: Run Docker Image
+        run: docker compose up -d
+      - name: Test Enviroment
+        run: curl http://localhost:8088
