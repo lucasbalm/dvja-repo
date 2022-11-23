@@ -32,14 +32,8 @@ jobs:
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v3
-    - name: Set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+    - name: Build with Maven and Fortify Translate (Maven Plugin)
+      run: mvn package com.fortify.sca.plugins.maven:sca-maven-plugin:22.2.0:translate
   sca-build:
     runs-on: self-hosted
     needs: build
@@ -63,16 +57,10 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
-    - name: Fortify SAST Translate (Sourcecodeanalyzer)
-      run: sourceanalyzer -b dvja mvn package
-    - name: Fortify SAST Scan (Sourcecodeanalyzer)
-      run: sourceanalyzer -b dvja -scan -f results.fpr
+    - name: Fortify SAST Scan (sourcecodeanalyzer)
+      run: sourceanalyzer -b dvja-1.0-SNAPSHOT -scan -f results.fpr
     - name: Upload FPR to Fortify SSC
       run: fortifyclient uploadFPR -url ${{secrets.SSC_URL}} -authtoken ${{secrets.SSC_UPLOAD_TOKEN}} -application DVJA  -applicationVersion 1.0 -file results.fpr
-  export-results:
-    runs-on: self-hosted
-    needs: sast
-    steps:
     - name: Export Results
       uses: fortify/gha-export-vulnerabilities@v1
       with:
@@ -108,7 +96,7 @@ jobs:
         # Determines the policy elements (policies, labels, and license threat groups) to associate with this build, and is managed via the Nexus IQ Server.
         applicationId: dvja
         # Controls the stage the policy evaluation will be run against on the Nexus IQ Server.
-        stage: stage
+        stage: stage-release
         # This is the path to a specific application archive file, a directory containing such archives or the ID of a Docker image. For archives, a number of formats are supported, including jar, war, ear, tar, tar.gz, zip and many others.
         target: dvja.tar
   docker-run:
