@@ -28,6 +28,7 @@ jobs:
         # This is the path to a specific application archive file, a directory containing such archives or the ID of a Docker image. For archives, a number of formats are supported, including jar, war, ear, tar, tar.gz, zip and many others.
         target: pom.xml
   build:
+    needs: sca-source
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v3
@@ -83,3 +84,11 @@ jobs:
       uses: github/codeql-action/upload-sarif@v1
       with:
         sarif_file: ./gh-fortify-sast.sarif
+  docker-build:
+    runs-on: self-hosted
+    needs: build
+    steps:
+    - name: Build Docker Image
+      run: docker compose build
+    - name: Run Docker Image
+      run: docker compose up
