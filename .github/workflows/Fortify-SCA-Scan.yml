@@ -10,7 +10,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  BUILD:
+  build:
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v3
@@ -22,8 +22,9 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-  SCA:
+  sca:
     runs-on: self-hosted
+    needs: build
     steps:
     - name: Nexus IQ for GitHub Actions
       uses: sonatype-nexus-community/iq-github-action@1.1.0
@@ -40,8 +41,9 @@ jobs:
         stage: build
         # This is the path to a specific application archive file, a directory containing such archives or the ID of a Docker image. For archives, a number of formats are supported, including jar, war, ear, tar, tar.gz, zip and many others.
         target: ./target/
-  SAST:
+  sast:
     runs-on: self-hosted
+    needs: build
     steps:
     - name: Fortify SAST Translate (Sourcecodeanalyzer)
       run: sourceanalyzer -b dvja mvn package
@@ -53,7 +55,7 @@ jobs:
       uses: fortify/gha-export-vulnerabilities@v1
       with:
         ssc_base_url: "http://fortify-linux:8080"
-        ssc_auth_token: "1f1062f9-ca0c-4ad4-8433-94909beea954"
+        ssc_auth_token: "aec12b21-97ea-4aab-8d06-792ea02fdd11"
         ssc_version_id: 6
     # Import Fortify SAST results to GitHub Security Code Scanning
     - name: Import Results
