@@ -8,7 +8,6 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
 jobs:
   build:
     runs-on: self-hosted
@@ -51,6 +50,10 @@ jobs:
       run: sourceanalyzer -b dvja -scan -f results.fpr
     - name: Upload FPR to Fortify SSC
       run: fortifyclient uploadFPR -url ${{secrets.SSC_URL}} -authtoken ${{secrets.SSC_UPLOAD_TOKEN}} -application DVJA  -applicationVersion 1.0 -file results.fpr
+  export-results:
+    runs-on: self-hosted
+    needs: sast
+    steps:
     - name: Export Results
       uses: fortify/gha-export-vulnerabilities@v1
       with:
