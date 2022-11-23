@@ -86,7 +86,7 @@ jobs:
         sarif_file: ./gh-fortify-sast.sarif
   docker-build:
     runs-on: self-hosted
-    needs: build
+    needs: [sast,sca-build]
     steps:
     - name: Build Docker Image
       run: docker compose build
