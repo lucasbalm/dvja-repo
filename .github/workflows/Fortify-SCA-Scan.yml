@@ -9,6 +9,24 @@ on:
   pull_request:
     branches: [ "master" ]
 jobs:
+  sca-source:
+    runs-on: self-hosted
+    steps:
+    - name: Nexus IQ SCA for GitHub Actions (Source File Scan)
+      uses: sonatype-nexus-community/iq-github-action@1.1.0
+      with:
+        # Nexus IQ Server URL
+        serverUrl: ${{secrets.NEXUS_IQ_SERVER_URL}}
+        # Username to connect to IQ Server for policy evaluation
+        username: ${{secrets.NEXUS_IQ_SERVER_USER}}
+        # Password to connect to IQ Server for policy evaluation
+        password: ${{secrets.NEXUS_IQ_SERVER_PASSWORD}}
+        # Determines the policy elements (policies, labels, and license threat groups) to associate with this build, and is managed via the Nexus IQ Server.
+        applicationId: dvja
+        # Controls the stage the policy evaluation will be run against on the Nexus IQ Server.
+        stage: source
+        # This is the path to a specific application archive file, a directory containing such archives or the ID of a Docker image. For archives, a number of formats are supported, including jar, war, ear, tar, tar.gz, zip and many others.
+        target: pom.xml
   build:
     runs-on: self-hosted
     steps:
@@ -21,11 +39,11 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-  sca:
+  sca-build:
     runs-on: self-hosted
     needs: build
     steps:
-    - name: Nexus IQ for GitHub Actions
+    - name: Nexus IQ SCA for GitHub Actions (Binary File Scan)
       uses: sonatype-nexus-community/iq-github-action@1.1.0
       with:
         # Nexus IQ Server URL
@@ -52,7 +70,7 @@ jobs:
       run: fortifyclient uploadFPR -url ${{secrets.SSC_URL}} -authtoken ${{secrets.SSC_UPLOAD_TOKEN}} -application DVJA  -applicationVersion 1.0 -file results.fpr
   export-results:
     runs-on: self-hosted
-    needs: [sast,sca]
+    needs: sast
     steps:
     - name: Export Results
       uses: fortify/gha-export-vulnerabilities@v1
