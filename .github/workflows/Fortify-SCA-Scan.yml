@@ -120,6 +120,7 @@ jobs:
           interval: 1000
   dast:
     runs-on: self-hosted
+    needs: docker-run
     steps:
     - name: ScanCentral DAST Scan
       run: pwsh .github/workflows/fortify-dast.ps1 ${{secrets.DAST_API_URL}} ${{secrets.DAST_CI_CD_TOKEN}} ${{secrets.SSC_USER}} ${{secrets.SSC_USER_PASSWORD}}  
