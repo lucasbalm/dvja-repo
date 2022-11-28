@@ -103,6 +103,8 @@ jobs:
       runs-on: self-hosted
       needs: sca-container
       steps:
+      - name: Stop Docker containers
+        run: docker compose down
       - name: Run Docker Image
         run: docker compose up -d
       - name: Wait For HTTP Responses
