@@ -1,7 +1,7 @@
 $url_scdast_api = $args[0]
 $cicdToken = $args[1]
 $user  = $args[2]
-$password  = $args[3]
+$password  = $args[2]
 $ErrorActionPreference = "Stop"
 
 $StopWatch = New-Object -TypeName System.Diagnostics.Stopwatch
