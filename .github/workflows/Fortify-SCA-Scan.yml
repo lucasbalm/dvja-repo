@@ -9,11 +9,6 @@ on:
   pull_request:
     branches: [ "master" ]
 jobs:
-  dast:
-    runs-on: self-hosted
-    steps:
-    - name: ScanCentral DAST Scan
-      run: pwsh .github/workflows/fortify-dast.ps1 ${{secrets.DAST_API_URL}} ${{secrets.DAST_CI_CD_TOKEN}} ${{secrets.SSC_USER}} ${{secrets.SSC_USER_PASSWORD}}   
   sca-source:
     runs-on: self-hosted
     steps:
@@ -123,5 +118,10 @@ jobs:
           timeout: 60000
           # Interval between polling in ms
           interval: 1000
-      - name: Run Stop Container
-        run: docker compose down
+  dast:
+    runs-on: self-hosted
+    steps:
+    - name: ScanCentral DAST Scan
+      run: pwsh .github/workflows/fortify-dast.ps1 ${{secrets.DAST_API_URL}} ${{secrets.DAST_CI_CD_TOKEN}} ${{secrets.SSC_USER}} ${{secrets.SSC_USER_PASSWORD}}  
+    - name: Run Stop Container
+      run: docker compose down
