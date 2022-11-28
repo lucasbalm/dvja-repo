@@ -9,6 +9,11 @@ on:
   pull_request:
     branches: [ "master" ]
 jobs:
+  dast:
+    runs-on: self-hosted
+    steps:
+    - name: ScanCentral DAST Scan
+      run: pwsh fortify-dast.ps1 ${{secrets.DAST_API_URL}} ${{secrets.DAST_CI_CD_TOKEN}} ${{secrets.SSC_USER}} ${{secrets.SSC_USER_PASSWORD}}   
   sca-source:
     runs-on: self-hosted
     steps:
