@@ -38,7 +38,7 @@ jobs:
       - name: Download Fortify ScanCentral Client
         uses: fortify/gha-setup-scancentral-client@v1   
         with:
-          version: 21.2.0                                      # On-prem customers should specify a client version that matches their ScanCentral environment
+          version: 22.2.0                                      # On-prem customers should specify a client version that matches their ScanCentral environment
                                                                # FoD customers usually should not specify a version but rather rely on the default version
           client-auth-token: "CHANGEME321!"  # Optional, but required if ScanCentral Controller requires client authentication
 
@@ -50,7 +50,7 @@ jobs:
         run: scancentral -url ${SC_CONTROLLER_URL} start $BUILD_OPTS -upload -application $APPLICATION -version $VERSION -uptoken $SSC_UPLOAD_TOKEN
         env:                                            
           SC_CONTROLLER_URL: http://fortify-linux:8181/scancentral-ctrl
-          SSC_UPLOAD_TOKEN: "f1d1430f-24da-4111-8693-3f7e53c27a76"
+          SSC_UPLOAD_TOKEN: "aec12b21-97ea-4aab-8d06-792ea02fdd116"
           APPLICATION: "DVJA"
           VERSION: "1.0"
           BUILD_OPTS: "-bt mvn"
