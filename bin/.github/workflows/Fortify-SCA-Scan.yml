@@ -1,0 +1,130 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Fortify DVJA
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+jobs:
+  sca-source:
+    runs-on: self-hosted
+    steps:
+    - name: Nexus IQ SCA (Source File Scan)
+      uses: sonatype-nexus-community/iq-github-action@1.1.0
+      with:
+        # Nexus IQ Server URL
+        serverUrl: ${{secrets.NEXUS_IQ_SERVER_URL}}
+        # Username to connect to IQ Server for policy evaluation
+        username: ${{secrets.NEXUS_IQ_SERVER_USER}}
+        # Password to connect to IQ Server for policy evaluation
+        password: ${{secrets.NEXUS_IQ_SERVER_PASSWORD}}
+        # Determines the policy elements (policies, labels, and license threat groups) to associate with this build, and is managed via the Nexus IQ Server.
+        applicationId: dvja
+        # Controls the stage the policy evaluation will be run against on the Nexus IQ Server.
+        stage: source
+        # This is the path to a specific application archive file, a directory containing such archives or the ID of a Docker image. For archives, a number of formats are supported, including jar, war, ear, tar, tar.gz, zip and many others.
+        target: pom.xml
+  build:
+    needs: sca-source
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build with Maven and Fortify Translate (Maven Plugin)
+      run: mvn package com.fortify.sca.plugins.maven:sca-maven-plugin:22.2.0:translate
+  sca-build:
+    runs-on: self-hosted
+    needs: build
+    steps:
+    - name: Nexus IQ SCA (Binary File Scan)
+      uses: sonatype-nexus-community/iq-github-action@1.1.0
+      with:
+        # Nexus IQ Server URL
+        serverUrl: ${{secrets.NEXUS_IQ_SERVER_URL}}
+        # Username to connect to IQ Server for policy evaluation
+        username: ${{secrets.NEXUS_IQ_SERVER_USER}}
+        # Password to connect to IQ Server for policy evaluation
+        password: ${{secrets.NEXUS_IQ_SERVER_PASSWORD}}
+        # Determines the policy elements (policies, labels, and license threat groups) to associate with this build, and is managed via the Nexus IQ Server.
+        applicationId: dvja
+        # Controls the stage the policy evaluation will be run against on the Nexus IQ Server.
+        stage: build
+        # This is the path to a specific application archive file, a directory containing such archives or the ID of a Docker image. For archives, a number of formats are supported, including jar, war, ear, tar, tar.gz, zip and many others.
+        target: ./target/
+  sast:
+    runs-on: self-hosted
+    needs: build
+    steps:
+    - name: Fortify SAST Scan (sourcecodeanalyzer)
+      run: sourceanalyzer -b dvja-1.0-SNAPSHOT -scan -f results.fpr
+    - name: Upload FPR to Fortify SSC
+      run: fortifyclient uploadFPR -url ${{secrets.SSC_URL}} -authtoken ${{secrets.SSC_UPLOAD_TOKEN}} -application DVJA  -applicationVersion 1.0 -file results.fpr
+    - name: Export Results
+      uses: fortify/gha-export-vulnerabilities@v1
+      with:
+        ssc_base_url: "http://fortify-linux:8080"
+        ssc_auth_token: ${{secrets.SSC_CI_TOKEN}} 
+        ssc_version_id: 6
+    # Import Fortify SAST results to GitHub Security Code Scanning
+    - name: Import Results
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: ./gh-fortify-sast.sarif
+  docker-build:
+    runs-on: self-hosted
+    needs: [sast,sca-build]
+    steps:
+    - name: Build Docker Image
+      run: docker compose build
+    - name: Export docker image
+      run: docker save dvja-app -o dvja.tar
+  sca-container:
+    runs-on: self-hosted
+    needs: docker-build
+    steps:
+    - name: Nexus IQ SCA (Docker image file Scan)
+      uses: sonatype-nexus-community/iq-github-action@1.1.0
+      with:
+        # Nexus IQ Server URL
+        serverUrl: ${{secrets.NEXUS_IQ_SERVER_URL}}
+        # Username to connect to IQ Server for policy evaluation
+        username: ${{secrets.NEXUS_IQ_SERVER_USER}}
+        # Password to connect to IQ Server for policy evaluation
+        password: ${{secrets.NEXUS_IQ_SERVER_PASSWORD}}
+        # Determines the policy elements (policies, labels, and license threat groups) to associate with this build, and is managed via the Nexus IQ Server.
+        applicationId: dvja
+        # Controls the stage the policy evaluation will be run against on the Nexus IQ Server.
+        stage: stage-release
+        # This is the path to a specific application archive file, a directory containing such archives or the ID of a Docker image. For archives, a number of formats are supported, including jar, war, ear, tar, tar.gz, zip and many others.
+        target: dvja.tar
+  docker-run:
+      runs-on: self-hosted
+      needs: sca-container
+      steps:
+      - name: Stop Docker containers
+        run: docker compose down
+      - name: Run Docker Image
+        run: docker compose up -d
+      - name: Wait For HTTP Responses
+        # You may pin to the exact commit or the version.
+        # uses: cygnetdigital/wait_for_response@510ed9823ee9c5f876e57d25bd87c575032d8156
+        uses: cygnetdigital/wait_for_response@v2.0.0
+        with:
+          # URL to poll
+          url: http://fortify-linux:8088/
+          # Response code to wait for
+          responseCode: 200
+          # Timeout before giving up in ms
+          timeout: 60000
+          # Interval between polling in ms
+          interval: 1000
+  dast:
+    runs-on: self-hosted
+    needs: docker-run
+    steps:
+    - name: ScanCentral DAST Scan
+      run: pwsh .github/workflows/fortify-dast.ps1 ${{secrets.DAST_API_URL}} ${{secrets.DAST_CI_CD_TOKEN}} ${{secrets.SSC_USER}} ${{secrets.SSC_USER_PASSWORD}}  
+    - name: Run Stop Container
+      run: docker compose down
