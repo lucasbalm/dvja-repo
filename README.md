@@ -1,5 +1,5 @@
 # Damn Vulnerable Java Application
-
+[![Fortify DVJA](https://github.com/lucasbalm/dvja/actions/workflows/Fortify-SCA-Scan.yml/badge.svg)](https://github.com/lucasbalm/dvja/actions/workflows/Fortify-SCA-Scan.yml)
 ## Quick Start
 
 Install Docker and Docker Compose.
