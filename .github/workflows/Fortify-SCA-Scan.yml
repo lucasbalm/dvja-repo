@@ -9,7 +9,12 @@ on:
   pull_request:
     branches: [ "master" ]
 jobs:
-  
+  checkout:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
+ 
   sca-source:
     runs-on: self-hosted
     steps:
