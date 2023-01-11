@@ -9,11 +9,12 @@ on:
   pull_request:
     branches: [ "master" ]
 jobs:
+  
   sca-source:
     runs-on: self-hosted
     steps:
     - name: Nexus IQ SCA (Source File Scan)
-      uses: sonatype-nexus-community/iq-github-action@1.1.0
+      uses: sonatype-nexus-community/iq-github-action@1.1.1
       with:
         # Nexus IQ Server URL
         serverUrl: ${{secrets.NEXUS_IQ_SERVER_URL}}
@@ -39,7 +40,7 @@ jobs:
     needs: build
     steps:
     - name: Nexus IQ SCA (Binary File Scan)
-      uses: sonatype-nexus-community/iq-github-action@1.1.0
+      uses: sonatype-nexus-community/iq-github-action@1.1.1
       with:
         # Nexus IQ Server URL
         serverUrl: ${{secrets.NEXUS_IQ_SERVER_URL}}
@@ -85,7 +86,7 @@ jobs:
     needs: docker-build
     steps:
     - name: Nexus IQ SCA (Docker image file Scan)
-      uses: sonatype-nexus-community/iq-github-action@1.1.0
+      uses: sonatype-nexus-community/iq-github-action@1.1.1
       with:
         # Nexus IQ Server URL
         serverUrl: ${{secrets.NEXUS_IQ_SERVER_URL}}
