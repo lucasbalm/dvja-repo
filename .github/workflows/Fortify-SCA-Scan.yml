@@ -12,11 +12,12 @@ jobs:
   checkout:
     runs-on: self-hosted
     steps:
-      - name: Checkout
+      - name: Git Checkout
         uses: actions/checkout@v3.3.0
  
   sca-source:
     runs-on: self-hosted
+    needs: checkout
     steps:
     - name: Nexus IQ SCA (Source File Scan)
       uses: sonatype-nexus-community/iq-github-action@1.1.1
