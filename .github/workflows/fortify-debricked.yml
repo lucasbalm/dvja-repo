@@ -70,7 +70,7 @@ jobs:
       run: docker save dvja-app -o dvja.tar
   docker-run:
       runs-on: self-hosted
-      needs: sca-container
+      needs: docker-build
       steps:
       - name: Stop Docker containers
         run: docker compose down
