@@ -63,14 +63,14 @@
              <artifactId>json</artifactId>
              <version>20220320</version>
          </dependency>
-        <!-- Fortify SCA Annotations
+
         <dependency>
             <groupId>com.microfocus.fortify</groupId>
             <artifactId>FortifyAnnotations</artifactId>
             <version>${fortify.version}}</version>
         </dependency-->
 
-        <!-- AOP dependency -->
+
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
