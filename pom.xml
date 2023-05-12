@@ -53,6 +53,22 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.5.2</version>
         </dependency>
+        <dependency>
+             <groupId>org.apache.tika</groupId>
+             <artifactId>tika-core</artifactId>
+             <version>1.18</version>
+         </dependency>
+         <dependency>
+             <groupId>org.json</groupId>
+             <artifactId>json</artifactId>
+             <version>20220320</version>
+         </dependency>
+        <!-- Fortify SCA Annotations
+        <dependency>
+            <groupId>com.microfocus.fortify</groupId>
+            <artifactId>FortifyAnnotations</artifactId>
+            <version>${fortify.version}}</version>
+        </dependency-->
 
         <!-- AOP dependency -->
         <dependency>
